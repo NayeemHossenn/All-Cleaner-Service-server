@@ -15,11 +15,29 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-client.connect((err) => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});
+
+async function run() {
+  try {
+    const serviceCollection = client
+      .db("cleaningService")
+      .collection("services");
+
+    app.get("/services", async (req, res) => {
+      const query = {};
+      const cursor = serviceCollection.find(query);
+      const services = await cursor.limit(3).toArray();
+      res.send(services);
+    });
+    app.get("/allservices", async (req, res) => {
+      const query = {};
+      const cursor = serviceCollection.find(query);
+      const services = await cursor.toArray();
+      res.send(services);
+    });
+  } finally {
+  }
+}
+run().catch((error) => console.log(error));
 
 app.get("/", (resq, res) => {
   res.send("All cleaner ruever is running");
