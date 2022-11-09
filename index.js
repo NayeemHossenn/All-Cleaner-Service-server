@@ -21,6 +21,7 @@ async function run() {
     const serviceCollection = client
       .db("cleaningService")
       .collection("services");
+    const reviewCollection = client.db("cleaningService").collection("reviews");
 
     app.get("/services", async (req, res) => {
       const query = {};
@@ -38,10 +39,15 @@ async function run() {
         const id = req.params.id;
         const query = { _id: ObjectId(id) };
         const services = await serviceCollection.findOne(query);
-        // const services = serviceCollection.find(
-        //   (service) => service._id === id
-        // );
         res.send(services);
+
+        //post
+
+        app.post("/reviews", async (req, res) => {
+          const review = req.body;
+          const result = await reviewCollection.insertOne(review);
+          res.send(result);
+        });
       });
     });
   } finally {
